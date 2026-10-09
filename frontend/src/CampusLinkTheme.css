@@ -1,0 +1,296 @@
+/* =========================================================
+   CAMPUSLINK JUDGE VISUAL SYSTEM — GLOBAL OVERRIDE
+   Loaded after App.css + enterprise.css.
+   Purpose: unify every module without rewriting backend logic.
+   ========================================================= */
+:root{
+  --cl-bg:#eef2ff;
+  --cl-bg-2:#f8fbff;
+  --cl-surface:#fbfcff;
+  --cl-surface-2:#f4f7ff;
+  --cl-surface-dark:#10162b;
+  --cl-surface-dark-2:#1a2450;
+  --cl-ink:#0b1020;
+  --cl-ink-2:#26324a;
+  --cl-muted:#667085;
+  --cl-muted-2:#98a2b3;
+  --cl-line:#dce4f2;
+  --cl-primary:#695cff;
+  --cl-primary-2:#2ec5ff;
+  --cl-violet:#8b5cf6;
+  --cl-cyan:#18b9d6;
+  --cl-green:#16b979;
+  --cl-orange:#f59e0b;
+  --cl-red:#e34d6f;
+  --cl-shadow:0 26px 70px rgba(35,44,90,.12);
+  --cl-shadow-soft:0 14px 36px rgba(35,44,90,.08);
+}
+
+html{scroll-behavior:smooth}
+body{
+  margin:0;
+  color:var(--cl-ink)!important;
+  background:
+    radial-gradient(circle at 5% 0%,rgba(105,92,255,.16),transparent 28%),
+    radial-gradient(circle at 100% 0%,rgba(46,197,255,.12),transparent 26%),
+    linear-gradient(180deg,#f7f9ff 0%,var(--cl-bg) 55%,#eef7ff 100%)!important;
+  font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif!important;
+}
+
+/* Global typography safety: stop inherited white text from leaking into light cards. */
+.page-content,.page-content main,.page-hero,.page-card,.sdb-card,.rdb-section,.pod-card,
+.dashboard-card,.empty-state-card,.srs-card,.srs-editor,.srs-preview-wrap,
+.onboarding-page,.onboard-card,.choice-card,.air-card,.air-filterbar,.air-page{
+  color:var(--cl-ink)!important;
+}
+.page-content p,.page-card p,.sdb-card p,.rdb-section p,.pod-card p,.srs-card p,.srs-editor p,
+.onboard-card p,.choice-card p,.air-page p{color:var(--cl-muted)!important}
+.page-content h1,.page-content h2,.page-content h3,.page-content h4,
+.page-card h1,.page-card h2,.page-card h3,.page-card h4,
+.srs-editor h1,.srs-editor h2,.srs-editor h3,.onboard-card h1,.onboard-card h2,.onboard-card h3,
+.choice-card h1,.choice-card h2,.choice-card h3{color:var(--cl-ink)!important}
+
+/* Shared dashboard chrome */
+.dashboard-page,.page-content,.sdb-shell,.rdb-shell,.pod-shell{background:transparent!important}
+.dashboard-header{
+  background:rgba(250,252,255,.86)!important;
+  color:var(--cl-ink)!important;
+  border-bottom:1px solid var(--cl-line)!important;
+  box-shadow:0 10px 36px rgba(35,44,90,.06)!important;
+  backdrop-filter:blur(22px)!important;
+}
+.brand-mark,.onboarding-logo,.login-brand-mark,.air-logo{
+  background:linear-gradient(135deg,var(--cl-primary),var(--cl-primary-2))!important;
+  box-shadow:0 14px 30px rgba(105,92,255,.24)!important;
+}
+.sidebar,.sdb-side,.rdb-sidebar,.pod-side{
+  background:linear-gradient(180deg,#0b1020 0%,#121a35 100%)!important;
+  box-shadow:18px 0 44px rgba(10,15,35,.16)!important;
+}
+.sidebar-link,.sdb-link,.rdb-nav-item,.pod-link{color:#b7c0d4!important}
+.sidebar-link:hover,.sdb-link:hover,.rdb-nav-item:hover,.pod-link:hover{background:rgba(255,255,255,.07)!important;color:#fff!important}
+.sidebar-link-active,.sdb-link.active,.rdb-nav-item.active,.pod-link.active{
+  background:linear-gradient(135deg,rgba(105,92,255,.40),rgba(46,197,255,.17))!important;
+  color:#fff!important;
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.10),0 12px 28px rgba(0,0,0,.18)!important;
+}
+
+/* Shared surfaces */
+.page-hero,.dashboard-card,.empty-state-card,.page-card,.sdb-card,.rdb-section,.pod-card,
+.srs-editor,.srs-preview-wrap,.onboard-card,.choice-card,.air-card{
+  background:linear-gradient(180deg,rgba(255,255,255,.96),rgba(248,251,255,.96))!important;
+  border:1px solid var(--cl-line)!important;
+  box-shadow:var(--cl-shadow-soft)!important;
+  border-radius:20px!important;
+}
+.dashboard-card:hover,.rdb-action-card:hover,.pod-actions a:hover,.choice-card:hover,.air-card:hover{
+  transform:translateY(-5px)!important;
+  border-color:rgba(105,92,255,.32)!important;
+  box-shadow:var(--cl-shadow)!important;
+}
+
+/* Form controls globally */
+input,textarea,select{
+  color:var(--cl-ink)!important;
+  background:#f9fbff!important;
+  border:1px solid #d7dfef!important;
+}
+input::placeholder,textarea::placeholder{color:#a0aabd!important}
+input:focus,textarea:focus,select:focus{
+  border-color:rgba(105,92,255,.66)!important;
+  box-shadow:0 0 0 4px rgba(105,92,255,.11)!important;
+  outline:none!important;
+}
+button{font-family:inherit}
+.primary-btn,.air-primary,.rdb-btn.primary,.pod-header button,.srs-actions .primary,.srs-bottom-actions .primary{
+  background:linear-gradient(135deg,var(--cl-primary),var(--cl-violet))!important;
+  color:#fff!important;
+  border-color:transparent!important;
+  box-shadow:0 14px 30px rgba(105,92,255,.22)!important;
+}
+.secondary-btn,.air-ghost,.rdb-btn.secondary,.srs-actions .secondary,.srs-bottom-actions .secondary{
+  background:#fff!important;color:var(--cl-ink-2)!important;border-color:#d8e0ed!important;
+}
+.primary-btn:hover,.air-primary:hover,.rdb-btn.primary:hover,.srs-actions .primary:hover{transform:translateY(-2px)!important}
+
+/* =========================================================
+   RESUME INTELLIGENCE — FIXES THE SCREENSHOT
+   ========================================================= */
+.resume-layout{background:transparent!important}
+.resume-layout>.page-card{background:linear-gradient(180deg,#fcfdff 0%,#f7f9ff 100%)!important}
+.resume-layout .section-heading h3,
+.resume-layout .section-heading p,
+.resume-layout .form-field label{color:var(--cl-ink)!important}
+.resume-layout .section-heading p{color:var(--cl-muted)!important}
+.resume-layout .upload-zone{
+  background:
+    radial-gradient(circle at 20% 15%,rgba(105,92,255,.10),transparent 32%),
+    linear-gradient(180deg,#f7f9ff,#eef4ff)!important;
+  border:1.5px dashed #aebcf4!important;
+  color:var(--cl-ink)!important;
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.75)!important;
+}
+.resume-layout .upload-zone strong{color:var(--cl-ink)!important}
+.resume-layout .upload-zone span{color:var(--cl-muted)!important}
+.resume-layout .upload-icon{background:linear-gradient(135deg,#dfe6ff,#d9f5ff)!important;color:var(--cl-primary)!important}
+.resume-layout .status-dot{background:linear-gradient(135deg,#e8e5ff,#dff8ff)!important;color:var(--cl-primary)!important;border-color:#d3dcf2!important}
+.resume-layout .analysis-panel{
+  background:
+    radial-gradient(circle at 90% 0%,rgba(46,197,255,.18),transparent 32%),
+    radial-gradient(circle at 10% 100%,rgba(105,92,255,.19),transparent 35%),
+    linear-gradient(145deg,#121a34,#1b2750)!important;
+  color:#fff!important;
+  border:1px solid rgba(117,140,207,.26)!important;
+  border-radius:20px!important;
+  box-shadow:0 22px 55px rgba(15,22,55,.20)!important;
+}
+.resume-layout .analysis-panel h3{color:#fff!important}
+.resume-layout .analysis-panel .section-kicker{color:#89e6ff!important}
+.resume-layout .analysis-panel .score-pill{
+  background:linear-gradient(135deg,#eff1ff,#e8fbff)!important;
+  color:#4d3dca!important;
+  border:1px solid rgba(255,255,255,.35)!important;
+}
+.resume-layout .analysis-panel .metric-card{
+  background:linear-gradient(180deg,#ffffff,#f6f8ff)!important;
+  border:1px solid #e3e8f3!important;
+  color:var(--cl-ink)!important;
+  border-radius:16px!important;
+  box-shadow:0 12px 30px rgba(4,12,35,.12)!important;
+}
+.resume-layout .analysis-panel .metric-card span{color:#718096!important}
+.resume-layout .analysis-panel .metric-card strong{color:var(--cl-ink)!important}
+.resume-layout .analysis-panel .suggestion-list h4{color:#fff!important}
+.resume-layout .analysis-panel .suggestion-item{
+  background:rgba(255,255,255,.07)!important;
+  border:1px solid rgba(255,255,255,.10)!important;
+  color:#ecf2ff!important;
+}
+.resume-layout .analysis-panel .suggestion-item p{color:#d4dcef!important}
+.resume-layout .verification-card{
+  background:linear-gradient(135deg,#ebfff7,#f2fffb)!important;
+  border:1px solid #aee8cf!important;
+  color:#0b6b4c!important;
+  box-shadow:0 16px 34px rgba(22,185,121,.10)!important;
+}
+.resume-layout .verification-card strong{color:#0b6b4c!important}
+.resume-layout .verification-card p{color:#4e806e!important}
+.resume-layout .status-message.success{background:#eafff6!important;border-color:#aae5cb!important;color:#087553!important}
+.resume-layout .status-message.error{background:#fff1f4!important;border-color:#f0bdca!important;color:#a21d42!important}
+.resume-layout .form-field textarea{min-height:240px}
+
+/* =========================================================
+   RESUME STUDIO
+   ========================================================= */
+.srs-page{
+  min-height:100vh!important;
+  background:
+    radial-gradient(circle at 0 0,rgba(105,92,255,.13),transparent 28%),
+    linear-gradient(180deg,#f7f9ff,#edf3ff)!important;
+  color:var(--cl-ink)!important;
+}
+.srs-topbar{background:rgba(250,252,255,.88)!important;border:1px solid var(--cl-line)!important;border-radius:20px!important;padding:18px 20px!important;box-shadow:var(--cl-shadow-soft)!important}
+.srs-topbar h1,.srs-card-head h2{color:var(--cl-ink)!important}
+.srs-topbar p,.srs-card-head p,.preview-toolbar small{color:var(--cl-muted)!important}
+.srs-editor,.srs-preview-wrap{background:linear-gradient(180deg,#fcfdff,#f7f9ff)!important}
+.srs-field,.srs-field label{color:var(--cl-ink-2)!important}
+.resume-paper{background:#fff!important;color:#111827!important;box-shadow:0 26px 50px rgba(35,44,90,.14)!important}
+.resume-head{border-bottom-color:#1c2740!important}
+.resume-section h3{color:#334155!important;border-bottom-color:#ccd5e3!important}
+.resume-section p,.resume-row span,.resume-head div{color:#4b5563!important}
+.resume-skill-row span{background:#eff4ff!important;border-color:#c8d5f6!important;color:#3b4a7a!important}
+
+/* =========================================================
+   ONBOARDING
+   ========================================================= */
+.onboarding-page{background:linear-gradient(180deg,#f7f9ff,#eef4ff)!important;color:var(--cl-ink)!important}
+.onboarding-topbar{background:rgba(250,252,255,.9)!important;border-bottom-color:var(--cl-line)!important}
+.onboarding-heading h1{color:var(--cl-ink)!important}
+.onboarding-heading p{color:var(--cl-muted)!important}
+.onboard-card,.choice-card{background:linear-gradient(180deg,#fcfdff,#f7f9ff)!important}
+.choice-card span,.card-head>div>span{color:var(--cl-primary)!important}
+.choice-card p{color:var(--cl-muted)!important}
+.onboard-field span{color:var(--cl-ink-2)!important}
+.onboard-field input,.onboard-field textarea{background:#f9fbff!important;color:var(--cl-ink)!important}
+.review-metric{background:#f5f8ff!important;border-color:#dae3f2!important}
+.review-metric strong{color:var(--cl-ink)!important}
+.photo-preview{background:#eef3ff!important;border-color:#d7e0ef!important}
+.camera-box{background:#f4f7ff!important;border-color:#d8e1ef!important}
+
+/* =========================================================
+   STUDENT DASHBOARD / JOBS / APPLICATIONS / INTERVIEWS / OFFERS /
+   NOTIFICATIONS / DOCUMENTS
+   ========================================================= */
+.sdb-kpi,.sdb-job,.sdb-list>div,.sdb-side-bottom,.sdb-card,.sdb-chart,
+.rdb-kpi,.rdb-row,.rdb-action-card,.pod-kpi,.pod-card,.pod-actions a{
+  background:linear-gradient(180deg,#fcfdff,#f7f9ff)!important;
+  border-color:var(--cl-line)!important;
+}
+.sdb-job-body>span,.sdb-tags b,.sdb-job-score small,.sdb-list span,.sdb-empty,
+.rdb-row span,.rdb-action-card small,.pod-kpi span,.pod-kpi small{color:var(--cl-muted)!important}
+.sdb-job-score strong,.sdb-job-score a,.sdb-section-head a,.rdb-link{color:var(--cl-primary)!important}
+
+/* Preserve intentional dark insight cards but make their contrast explicit. */
+.sdb-dark,.rdb-insight,.pod-dark,.ai-center-builder{
+  background:linear-gradient(145deg,#10162c,#202d5a)!important;
+  color:#fff!important;
+  border-color:#29365f!important;
+}
+.sdb-dark h2,.rdb-insight strong,.pod-dark h2,.ai-center-builder h2{color:#fff!important}
+.sdb-dark p,.rdb-insight small,.pod-dark p,.ai-center-builder p{color:#c9d3ec!important}
+
+/* =========================================================
+   RECRUITER / PLACEMENT ANALYTICS INLINE-STYLE OVERRIDES
+   ========================================================= */
+.rdb-shell,.pod-shell{background:transparent!important;color:var(--cl-ink)!important}
+.rdb-topbar,.pod-header{background:rgba(250,252,255,.90)!important;border-bottom-color:var(--cl-line)!important;color:var(--cl-ink)!important}
+.rdb-topbar h1,.pod-header h1{color:var(--cl-ink)!important}
+.rdb-topbar p,.pod-header p{color:var(--cl-muted)!important}
+.rdb-section[style],.rdb-kpi[style],.rdb-action-card[style],.pod-card[style],.pod-kpi[style]{background:linear-gradient(180deg,#fcfdff,#f7f9ff)!important;color:var(--cl-ink)!important;border-color:var(--cl-line)!important}
+.pod-card[style] *, .rdb-section[style] *{color:inherit}
+.pod-main .pod-header button{color:#fff!important}
+
+/* =========================================================
+   AI RECOMMENDATIONS
+   ========================================================= */
+.air-page{background:transparent!important;color:var(--cl-ink)!important}
+.air-topbar{background:rgba(250,252,255,.90)!important;border-bottom-color:var(--cl-line)!important}
+.air-topbar strong,.air-hero h1,.air-card h2,.air-card h3{color:var(--cl-ink)!important}
+.air-hero p,.air-card p,.air-card small,.air-filterbar span{color:var(--cl-muted)!important}
+.air-filterbar{background:rgba(252,253,255,.96)!important;border-color:var(--cl-line)!important}
+.air-search,.air-select-wrap select{background:#f9fbff!important;border-color:#d7dfef!important;color:var(--cl-ink)!important}
+.match-ring{box-shadow:0 18px 45px rgba(105,92,255,.14)!important}
+
+/* AI Command Center */
+.ai-center-page{background:transparent!important}
+.ai-tool-card{background:linear-gradient(180deg,#fcfdff,#f7f9ff)!important;border-color:var(--cl-line)!important;color:var(--cl-ink)!important}
+.ai-tool-card h2{color:var(--cl-ink)!important}
+.ai-tool-card p,.ai-tool-tag{color:var(--cl-muted)!important}
+.ai-center-builder{box-shadow:0 28px 70px rgba(35,44,90,.20)!important}
+
+/* Login */
+.login-page{background:radial-gradient(circle at 15% 20%,rgba(105,92,255,.32),transparent 26%),radial-gradient(circle at 85% 15%,rgba(46,197,255,.20),transparent 24%),linear-gradient(135deg,#080d1c,#141c3d)!important}
+.login-card{background:rgba(255,255,255,.95)!important;color:var(--cl-ink)!important;box-shadow:0 38px 100px rgba(0,0,0,.34)!important;border-color:rgba(255,255,255,.18)!important}
+.login-heading h1,.login-card label{color:var(--cl-ink)!important}
+.login-heading p{color:var(--cl-muted)!important}
+
+/* Tutorial / modal */
+.cl-tour-backdrop,.air-modal-backdrop{background:rgba(4,8,20,.68)!important;backdrop-filter:blur(10px)!important}
+.cl-tour-card,.air-modal{background:linear-gradient(180deg,#fbfcff,#f6f8ff)!important;color:var(--cl-ink)!important;border:1px solid #dbe3f0!important}
+.cl-tour-card h2,.air-modal h2{color:var(--cl-ink)!important}
+.cl-tour-card p,.air-modal p{color:var(--cl-muted)!important}
+.tutorial-art,.cl-tour-art{background:radial-gradient(circle at 50% 40%,rgba(105,92,255,.55),transparent 30%),radial-gradient(circle at 25% 15%,rgba(46,197,255,.30),transparent 25%),linear-gradient(145deg,#10152b,#1f2b55)!important}
+
+/* Charts / tooltips */
+.recharts-cartesian-grid line{stroke:#dce4f0!important}
+.recharts-default-tooltip{background:#fff!important;color:var(--cl-ink)!important;border:1px solid var(--cl-line)!important;border-radius:12px!important;box-shadow:var(--cl-shadow-soft)!important}
+
+/* Mobile */
+@media(max-width:900px){
+  .resume-layout{grid-template-columns:1fr!important}
+  .ai-tool-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+}
+@media(max-width:600px){
+  .ai-tool-grid{grid-template-columns:1fr!important}
+  .page-content{padding-left:12px!important;padding-right:12px!important}
+}

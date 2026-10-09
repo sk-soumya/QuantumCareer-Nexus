@@ -1,0 +1,2027 @@
+import {
+  BrowserRouter,
+  Navigate,
+  Route,
+  Routes,
+  Link,
+  useNavigate,
+  useLocation,
+} from "react-router-dom";
+
+import { useEffect, useState } from "react";
+
+import "./App.css";
+
+// ============================================================
+// STUDENT PAGES
+// ============================================================
+
+import StudentJobs from "./StudentJobs";
+import StudentApplications from "./StudentApplications";
+import StudentInterviews from "./StudentInterviews";
+import StudentOffers from "./StudentOffers";
+import StudentNotifications from "./StudentNotifications";
+import StudentDocuments from "./StudentDocuments";
+import StudentAIRecommendations from "./StudentAIRecommendations";
+import StudentProfile from "./StudentProfile";
+
+// ============================================================
+// RECRUITER
+// ============================================================
+
+import RecruiterAICandidates from "./RecruiterAICandidates";
+import {
+  RecruiterCompany,
+  RecruiterJobs,
+  RecruiterApplications,
+  RecruiterInterviews,
+  RecruiterOffers,
+  RecruiterNotifications,
+} from "./RecruiterModules";
+
+// ============================================================
+// PLACEMENT OFFICER
+// ============================================================
+
+import PlacementStudents from "./PlacementStudents";
+import PlacementCompanies from "./PlacementCompanies";
+import PlacementJobDrives from "./PlacementJobDrives";
+import PlacementApplications from "./PlacementApplications";
+import PlacementSelectionRounds from "./PlacementSelectionRounds";
+import PlacementScheduling from "./PlacementScheduling";
+import PlacementOffers from "./PlacementOffers";
+import PlacementNotifications from "./PlacementNotifications";
+import PlacementDocuments from "./PlacementDocuments";
+
+// ============================================================
+// CONFIG
+// ============================================================
+
+const API_BASE_URL = "http://127.0.0.1:8000";
+
+// ============================================================
+// AUTH
+// ============================================================
+
+function getToken() {
+  return (
+    localStorage.getItem("campuslink_token") || ""
+  );
+}
+
+function decodeToken(token) {
+  try {
+    const payload = token.split(".")[1];
+
+    const normalized = payload
+      .replace(/-/g, "+")
+      .replace(/_/g, "/");
+
+    return JSON.parse(atob(normalized));
+  } catch {
+    return null;
+  }
+}
+
+function getRole() {
+  const token = getToken();
+
+  if (!token) {
+    return null;
+  }
+
+  const payload = decodeToken(token);
+
+  return payload?.role || null;
+}
+
+function getDashboardPath(role) {
+  if (role === "STUDENT") {
+    return "/student";
+  }
+
+  if (role === "RECRUITER") {
+    return "/recruiter";
+  }
+
+  if (role === "PLACEMENT_OFFICER") {
+    return "/placement";
+  }
+
+  if (role === "ADMIN") {
+    return "/admin";
+  }
+
+  return "/login";
+}
+
+// ============================================================
+// PROTECTED ROUTE
+// ============================================================
+
+function ProtectedRoute({
+  allowedRoles,
+  children,
+}) {
+  const token = getToken();
+  const role = getRole();
+  const location = useLocation();
+
+  if (!token || !role) {
+    return (
+      <Navigate
+        to="/login"
+        state={{ from: location.pathname }}
+        replace
+      />
+    );
+  }
+
+  if (
+    allowedRoles &&
+    !allowedRoles.includes(role)
+  ) {
+    return (
+      <Navigate
+        to={getDashboardPath(role)}
+        replace
+      />
+    );
+  }
+
+  return children;
+}
+
+// ============================================================
+// HEADER
+// ============================================================
+
+function DashboardHeader({
+  title,
+  role,
+}) {
+  const navigate = useNavigate();
+
+  const logout = () => {
+    localStorage.removeItem(
+      "campuslink_token"
+    );
+
+    navigate("/login", {
+      replace: true,
+    });
+  };
+
+  return (
+    <header className="dashboard-header">
+      <div>
+        <h1>CampusLink</h1>
+
+        <p>{title}</p>
+      </div>
+
+      <div className="header-right">
+        <span className="role-badge">
+          {role.replaceAll("_", " ")}
+        </span>
+
+        <button
+          type="button"
+          className="logout-btn"
+          onClick={logout}
+        >
+          Logout
+        </button>
+      </div>
+    </header>
+  );
+}
+
+// ============================================================
+// SIDEBAR
+// ============================================================
+
+function Sidebar({
+  items,
+}) {
+  return (
+    <aside className="sidebar">
+      {items.map((item) => (
+        <Link
+          key={item.path}
+          to={item.path}
+          className="sidebar-link"
+        >
+          <span>{item.icon}</span>
+          {item.label}
+        </Link>
+      ))}
+    </aside>
+  );
+}
+
+// ============================================================
+// NAVIGATION
+// ============================================================
+
+function getNavigation(role) {
+  if (role === "STUDENT") {
+    return [
+      {
+        label: "Dashboard",
+        icon: "🏠",
+        path: "/student",
+      },
+      {
+        label: "My Profile",
+        icon: "👤",
+        path: "/student/profile",
+      },
+      {
+        label: "Resume AI",
+        icon: "📄",
+        path: "/student/resume-ai",
+      },
+      {
+        label: "Job Drives",
+        icon: "💼",
+        path: "/student/jobs",
+      },
+      {
+        label: "Applications",
+        icon: "📝",
+        path: "/student/applications",
+      },
+      {
+        label: "Interviews",
+        icon: "📅",
+        path: "/student/interviews",
+      },
+      {
+        label: "Offers",
+        icon: "🎓",
+        path: "/student/offers",
+      },
+      {
+        label: "Documents",
+        icon: "📁",
+        path: "/student/documents",
+      },
+      {
+        label: "Notifications",
+        icon: "🔔",
+        path: "/student/notifications",
+      },
+      {
+        label: "AI Recommendations",
+        icon: "🤖",
+        path: "/student/recommendations",
+      },
+    ];
+  }
+
+  if (role === "RECRUITER") {
+    return [
+      {
+        label: "Dashboard",
+        icon: "🏠",
+        path: "/recruiter",
+      },
+      {
+        label: "Company",
+        icon: "🏢",
+        path: "/recruiter/company",
+      },
+      {
+        label: "Job Drives",
+        icon: "💼",
+        path: "/recruiter/jobs",
+      },
+      {
+        label: "Applications",
+        icon: "📝",
+        path: "/recruiter/applications",
+      },
+      {
+        label: "AI Candidates",
+        icon: "🤖",
+        path: "/recruiter/ai-candidates",
+      },
+      {
+        label: "Interviews",
+        icon: "📅",
+        path: "/recruiter/interviews",
+      },
+      {
+        label: "Offers",
+        icon: "🎓",
+        path: "/recruiter/offers",
+      },
+      {
+        label: "Notifications",
+        icon: "🔔",
+        path: "/recruiter/notifications",
+      },
+    ];
+  }
+
+  if (role === "PLACEMENT_OFFICER") {
+    return [
+      {
+        label: "Dashboard",
+        icon: "🏠",
+        path: "/placement",
+      },
+      {
+        label: "Students",
+        icon: "🎓",
+        path: "/placement/students",
+      },
+      {
+        label: "Companies",
+        icon: "🏢",
+        path: "/placement/companies",
+      },
+      {
+        label: "Job Drives",
+        icon: "💼",
+        path: "/placement/jobs",
+      },
+      {
+        label: "Applications",
+        icon: "📝",
+        path: "/placement/applications",
+      },
+      {
+        label: "Selection Rounds",
+        icon: "📋",
+        path: "/placement/selection-rounds",
+      },
+      {
+        label: "Scheduling",
+        icon: "📅",
+        path: "/placement/scheduling",
+      },
+      {
+        label: "Offers",
+        icon: "🎓",
+        path: "/placement/offers",
+      },
+      {
+        label: "Documents",
+        icon: "📁",
+        path: "/placement/documents",
+      },
+      {
+        label: "Notifications",
+        icon: "🔔",
+        path: "/placement/notifications",
+      },
+    ];
+  }
+
+  return [
+    {
+      label: "Dashboard",
+      icon: "🏠",
+      path: "/admin",
+    },
+    {
+      label: "Users",
+      icon: "👥",
+      path: "/admin/users",
+    },
+    {
+      label: "Students",
+      icon: "🎓",
+      path: "/admin/students",
+    },
+    {
+      label: "Recruiters",
+      icon: "🧑‍💼",
+      path: "/admin/recruiters",
+    },
+    {
+      label: "Placement Officers",
+      icon: "🏫",
+      path: "/admin/placement-officers",
+    },
+    {
+      label: "Companies",
+      icon: "🏢",
+      path: "/admin/companies",
+    },
+    {
+      label: "Job Drives",
+      icon: "💼",
+      path: "/admin/jobs",
+    },
+    {
+      label: "Applications",
+      icon: "📝",
+      path: "/admin/applications",
+    },
+    {
+      label: "Scheduling",
+      icon: "📅",
+      path: "/admin/scheduling",
+    },
+    {
+      label: "Offers",
+      icon: "🎓",
+      path: "/admin/offers",
+    },
+    {
+      label: "Documents",
+      icon: "📁",
+      path: "/admin/documents",
+    },
+    {
+      label: "Notifications",
+      icon: "🔔",
+      path: "/admin/notifications",
+    },
+    {
+      label: "Audit Logs",
+      icon: "🔐",
+      path: "/admin/audit",
+    },
+  ];
+}
+
+// ============================================================
+// GENERIC PLACEHOLDER
+// ============================================================
+
+function FeaturePage({
+  role,
+  title,
+}) {
+  return (
+    <div className="dashboard-page">
+      <DashboardHeader
+        title={title}
+        role={role}
+      />
+
+      <div className="dashboard-body">
+        <Sidebar
+          items={getNavigation(role)}
+        />
+
+        <main className="page-content">
+          <div className="page-card">
+            <h2>{title}</h2>
+
+            <p>
+              This CampusLink module is
+              currently under development.
+            </p>
+          </div>
+        </main>
+      </div>
+    </div>
+  );
+}
+
+// ============================================================
+// STUDENT DASHBOARD
+// ============================================================
+
+function StudentDashboard() {
+  return (
+    <div className="dashboard-page">
+      <DashboardHeader
+        title="Student Dashboard"
+        role="STUDENT"
+      />
+
+      <div className="dashboard-body">
+        <Sidebar
+          items={getNavigation("STUDENT")}
+        />
+
+        <main className="page-content">
+          <h2>
+            Welcome to your Student Dashboard
+          </h2>
+
+          <p>
+            Manage your profile, resume,
+            applications, interviews,
+            offers and AI recommendations.
+          </p>
+
+          <div className="dashboard-grid">
+            <Link
+              to="/student/profile"
+              className="dashboard-card"
+            >
+              <span>👤</span>
+              <h3>My Profile</h3>
+              <p>
+                Manage your student profile.
+              </p>
+            </Link>
+
+            <Link
+              to="/student/resume-ai"
+              className="dashboard-card"
+            >
+              <span>📄</span>
+              <h3>Resume AI</h3>
+              <p>
+                Analyze your resume.
+              </p>
+            </Link>
+
+            <Link
+              to="/student/jobs"
+              className="dashboard-card"
+            >
+              <span>💼</span>
+              <h3>Job Drives</h3>
+              <p>
+                Explore available jobs.
+              </p>
+            </Link>
+
+            <Link
+              to="/student/applications"
+              className="dashboard-card"
+            >
+              <span>📝</span>
+              <h3>Applications</h3>
+              <p>
+                Track applications.
+              </p>
+            </Link>
+
+            <Link
+              to="/student/interviews"
+              className="dashboard-card"
+            >
+              <span>📅</span>
+              <h3>Interviews</h3>
+              <p>
+                View interview schedules.
+              </p>
+            </Link>
+
+            <Link
+              to="/student/offers"
+              className="dashboard-card"
+            >
+              <span>🎓</span>
+              <h3>Offers</h3>
+              <p>
+                Review placement offers.
+              </p>
+            </Link>
+
+            <Link
+              to="/student/documents"
+              className="dashboard-card"
+            >
+              <span>📁</span>
+              <h3>Documents</h3>
+              <p>
+                View placement documents.
+              </p>
+            </Link>
+
+            <Link
+              to="/student/notifications"
+              className="dashboard-card"
+            >
+              <span>🔔</span>
+              <h3>Notifications</h3>
+              <p>
+                View placement updates.
+              </p>
+            </Link>
+
+            <Link
+              to="/student/recommendations"
+              className="dashboard-card"
+            >
+              <span>🤖</span>
+              <h3>AI Recommendations</h3>
+              <p>
+                View AI-powered job recommendations.
+              </p>
+            </Link>
+          </div>
+        </main>
+      </div>
+    </div>
+  );
+}
+
+// ============================================================
+// STUDENT RESUME AI
+// ============================================================
+
+function StudentResumeAI() {
+  const token = getToken();
+
+  const [file, setFile] =
+    useState(null);
+
+  const [analysis, setAnalysis] =
+    useState(null);
+
+  const [cgpa, setCgpa] =
+    useState("");
+
+  const [skills, setSkills] =
+    useState("");
+
+  const [resumeText, setResumeText] =
+    useState("");
+
+  const [loading, setLoading] =
+    useState(false);
+
+  const [saving, setSaving] =
+    useState(false);
+
+  const [message, setMessage] =
+    useState("");
+
+  useEffect(() => {
+    loadProfile();
+  }, []);
+
+  const loadProfile = async () => {
+    if (!token) {
+      return;
+    }
+
+    try {
+      const response =
+        await fetch(
+          `${API_BASE_URL}/student-profile/me`,
+          {
+            headers: {
+              Accept:
+                "application/json",
+              Authorization:
+                `Bearer ${token}`,
+            },
+          }
+        );
+
+      if (
+        response.status === 404 ||
+        !response.ok
+      ) {
+        return;
+      }
+
+      const data =
+        await response.json();
+
+      setCgpa(
+        data.cgpa !== null &&
+        data.cgpa !== undefined
+          ? String(data.cgpa)
+          : ""
+      );
+
+      setSkills(
+        data.skills || ""
+      );
+
+      setResumeText(
+        data.resume_text || ""
+      );
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const analyzeResume = async () => {
+    if (!file) {
+      setMessage(
+        "Please choose a PDF resume."
+      );
+      return;
+    }
+
+    setLoading(true);
+    setMessage("");
+
+    try {
+      const formData =
+        new FormData();
+
+      formData.append(
+        "file",
+        file
+      );
+
+      const response =
+        await fetch(
+          `${API_BASE_URL}/resume/analyze`,
+          {
+            method: "POST",
+            body: formData,
+          }
+        );
+
+      const data =
+        await response.json();
+
+      if (!response.ok) {
+        throw new Error(
+          data.detail ||
+            "Resume analysis failed."
+        );
+      }
+
+      setAnalysis(data);
+
+      setSkills(
+        Array.isArray(data.skills)
+          ? data.skills.join(", ")
+          : ""
+      );
+
+      if (
+        data.cgpa !== null &&
+        data.cgpa !== undefined
+      ) {
+        setCgpa(
+          String(data.cgpa)
+        );
+      }
+
+      setResumeText(
+        data.extracted_text || ""
+      );
+
+      setMessage(
+        "Resume analyzed successfully."
+      );
+    } catch (error) {
+      setMessage(
+        error.message ||
+          "Resume analysis failed."
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const saveProfile = async () => {
+    setSaving(true);
+    setMessage("");
+
+    try {
+      const cgpaValue =
+        cgpa.trim() === ""
+          ? null
+          : Number(cgpa);
+
+      if (
+        cgpaValue !== null &&
+        (
+          Number.isNaN(cgpaValue) ||
+          cgpaValue < 0 ||
+          cgpaValue > 10
+        )
+      ) {
+        throw new Error(
+          "CGPA must be between 0 and 10."
+        );
+      }
+
+      const response =
+        await fetch(
+          `${API_BASE_URL}/student-profile/me`,
+          {
+            method: "PUT",
+            headers: {
+              "Content-Type":
+                "application/json",
+              Accept:
+                "application/json",
+              Authorization:
+                `Bearer ${token}`,
+            },
+            body: JSON.stringify({
+              cgpa: cgpaValue,
+              skills,
+              resume_text:
+                resumeText,
+            }),
+          }
+        );
+
+      const data =
+        await response.json();
+
+      if (!response.ok) {
+        throw new Error(
+          data.detail ||
+            "Profile save failed."
+        );
+      }
+
+      setMessage(
+        "Profile saved successfully."
+      );
+
+      setCgpa(
+        data.cgpa !== null &&
+        data.cgpa !== undefined
+          ? String(data.cgpa)
+          : ""
+      );
+
+      setSkills(
+        data.skills || ""
+      );
+
+      setResumeText(
+        data.resume_text || ""
+      );
+    } catch (error) {
+      setMessage(
+        error.message ||
+          "Profile save failed."
+      );
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  return (
+    <div className="dashboard-page">
+      <DashboardHeader
+        title="Resume AI"
+        role="STUDENT"
+      />
+
+      <div className="dashboard-body">
+        <Sidebar
+          items={getNavigation("STUDENT")}
+        />
+
+        <main className="page-content">
+
+          <div className="page-card">
+            <h2>Resume AI</h2>
+
+            <p>
+              Upload and analyze your resume.
+            </p>
+
+            <input
+              type="file"
+              accept=".pdf,application/pdf"
+              onChange={(event) =>
+                setFile(
+                  event.target.files?.[0] ||
+                    null
+                )
+              }
+            />
+
+            <button
+              type="button"
+              className="primary-btn"
+              onClick={analyzeResume}
+              disabled={loading}
+            >
+              {loading
+                ? "Analyzing..."
+                : "Analyze Resume"}
+            </button>
+
+            {file && (
+              <p>
+                Selected:{" "}
+                <strong>
+                  {file.name}
+                </strong>
+              </p>
+            )}
+
+            {message && (
+              <p>{message}</p>
+            )}
+
+            {analysis && (
+              <div className="ai-result">
+                <h3>
+                  Detected Skills
+                </h3>
+
+                <p>
+                  {skills ||
+                    "No skills detected."}
+                </p>
+
+                {analysis.cgpa !== null &&
+                  analysis.cgpa !==
+                    undefined && (
+                    <p>
+                      <strong>
+                        Detected CGPA:
+                      </strong>{" "}
+                      {analysis.cgpa}
+                    </p>
+                  )}
+
+                <h3>
+                  Suggestions
+                </h3>
+
+                {analysis.suggestions?.map(
+                  (
+                    suggestion,
+                    index
+                  ) => (
+                    <p key={index}>
+                      ✓ {suggestion}
+                    </p>
+                  )
+                )}
+              </div>
+            )}
+          </div>
+
+          <div className="page-card">
+            <h2>
+              Student Profile
+            </h2>
+
+            <label>
+              CGPA
+            </label>
+
+            <input
+              type="number"
+              min="0"
+              max="10"
+              step="0.01"
+              value={cgpa}
+              onChange={(event) =>
+                setCgpa(
+                  event.target.value
+                )
+              }
+              placeholder="Example: 8.2"
+            />
+
+            <label>
+              Skills
+            </label>
+
+            <input
+              type="text"
+              value={skills}
+              onChange={(event) =>
+                setSkills(
+                  event.target.value
+                )
+              }
+              placeholder="Python, SQL, React"
+            />
+
+            <label>
+              Resume Text
+            </label>
+
+            <textarea
+              rows="12"
+              value={resumeText}
+              onChange={(event) =>
+                setResumeText(
+                  event.target.value
+                )
+              }
+            />
+
+            <button
+              type="button"
+              className="primary-btn"
+              onClick={saveProfile}
+              disabled={saving}
+            >
+              {saving
+                ? "Saving..."
+                : "Save Profile"}
+            </button>
+          </div>
+
+        </main>
+      </div>
+    </div>
+  );
+}
+
+// ============================================================
+// LOGIN
+// ============================================================
+
+function Login() {
+  const navigate =
+    useNavigate();
+
+  const [email, setEmail] =
+    useState("");
+
+  const [password, setPassword] =
+    useState("");
+
+  const [loading, setLoading] =
+    useState(false);
+
+  const [message, setMessage] =
+    useState("");
+
+  useEffect(() => {
+    const token = getToken();
+    const role = getRole();
+
+    if (token && role) {
+      navigate(
+        getDashboardPath(role),
+        {
+          replace: true,
+        }
+      );
+    }
+  }, [navigate]);
+
+  const login = async () => {
+    if (
+      !email.trim() ||
+      !password
+    ) {
+      setMessage(
+        "Enter email and password."
+      );
+      return;
+    }
+
+    setLoading(true);
+    setMessage("");
+
+    try {
+      const response =
+        await fetch(
+          `${API_BASE_URL}/auth/login`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type":
+                "application/json",
+              Accept:
+                "application/json",
+            },
+            body: JSON.stringify({
+              email:
+                email.trim(),
+              password,
+            }),
+          }
+        );
+
+      const data =
+        await response.json();
+
+      if (!response.ok) {
+        throw new Error(
+          data.detail ||
+            "Login failed."
+        );
+      }
+
+      if (!data.access_token) {
+        throw new Error(
+          "No access token returned."
+        );
+      }
+
+      localStorage.setItem(
+        "campuslink_token",
+        data.access_token
+      );
+
+      const payload =
+        decodeToken(
+          data.access_token
+        );
+
+      if (!payload?.role) {
+        throw new Error(
+          "Login token does not contain a role."
+        );
+      }
+
+      navigate(
+        getDashboardPath(
+          payload.role
+        ),
+        {
+          replace: true,
+        }
+      );
+    } catch (error) {
+      setMessage(
+        error.message ||
+          "Unable to login."
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="login-page">
+      <div className="login-card">
+
+        <h1>CampusLink</h1>
+
+        <p>
+          Placement Management
+          & AI Platform
+        </p>
+
+        <h2>Login</h2>
+
+        <label>
+          Email
+        </label>
+
+        <input
+          type="email"
+          value={email}
+          placeholder="student2@test.com"
+          onChange={(event) =>
+            setEmail(
+              event.target.value
+            )
+          }
+        />
+
+        <label>
+          Password
+        </label>
+
+        <input
+          type="password"
+          value={password}
+          placeholder="Enter password"
+          onChange={(event) =>
+            setPassword(
+              event.target.value
+            )
+          }
+        />
+
+        <button
+          type="button"
+          className="primary-btn"
+          onClick={login}
+          disabled={loading}
+        >
+          {loading
+            ? "Logging in..."
+            : "Login to CampusLink"}
+        </button>
+
+        {message && (
+          <p className="profile-message">
+            {message}
+          </p>
+        )}
+
+      </div>
+    </div>
+  );
+}
+
+// ============================================================
+// RECRUITER DASHBOARD
+// ============================================================
+
+function RecruiterDashboard() {
+  return (
+    <div className="dashboard-page">
+      <DashboardHeader
+        title="Recruiter Dashboard"
+        role="RECRUITER"
+      />
+
+      <div className="dashboard-body">
+        <Sidebar
+          items={getNavigation(
+            "RECRUITER"
+          )}
+        />
+
+        <main className="page-content">
+
+          <h2>
+            Recruiter Dashboard
+          </h2>
+
+          <p>
+            Manage hiring activities and
+            AI candidate recommendations.
+          </p>
+
+          <div className="dashboard-grid">
+
+            <Link
+              to="/recruiter/ai-candidates"
+              className="dashboard-card"
+            >
+              🤖
+              <h3>
+                AI Candidates
+              </h3>
+
+              <p>
+                View ranked candidates
+                for job drives.
+              </p>
+            </Link>
+
+            <Link
+              to="/recruiter/company"
+              className="dashboard-card"
+            >
+              🏢
+              <h3>Company</h3>
+            </Link>
+
+            <Link
+              to="/recruiter/jobs"
+              className="dashboard-card"
+            >
+              💼
+              <h3>Job Drives</h3>
+            </Link>
+
+            <Link
+              to="/recruiter/applications"
+              className="dashboard-card"
+            >
+              📝
+              <h3>Applications</h3>
+            </Link>
+
+            <Link
+              to="/recruiter/interviews"
+              className="dashboard-card"
+            >
+              📅
+              <h3>Interviews</h3>
+            </Link>
+
+            <Link
+              to="/recruiter/offers"
+              className="dashboard-card"
+            >
+              🎓
+              <h3>Offers</h3>
+            </Link>
+
+            <Link
+              to="/recruiter/notifications"
+              className="dashboard-card"
+            >
+              🔔
+              <h3>Notifications</h3>
+            </Link>
+
+          </div>
+
+        </main>
+      </div>
+    </div>
+  );
+}
+
+// ============================================================
+// PLACEMENT OFFICER DASHBOARD
+// ============================================================
+
+function PlacementDashboard() {
+  return (
+    <div className="dashboard-page">
+      <DashboardHeader
+        title="Placement Officer Dashboard"
+        role="PLACEMENT_OFFICER"
+      />
+
+      <div className="dashboard-body">
+        <Sidebar
+          items={getNavigation(
+            "PLACEMENT_OFFICER"
+          )}
+        />
+
+        <main className="page-content">
+
+          <h2>
+            Placement Officer Dashboard
+          </h2>
+
+          <p>
+            Manage the complete CampusLink
+            placement workflow.
+          </p>
+
+          <div className="dashboard-grid">
+
+            <Link
+              to="/placement/students"
+              className="dashboard-card"
+            >
+              🎓
+              <h3>Students</h3>
+            </Link>
+
+            <Link
+              to="/placement/companies"
+              className="dashboard-card"
+            >
+              🏢
+              <h3>Companies</h3>
+            </Link>
+
+            <Link
+              to="/placement/jobs"
+              className="dashboard-card"
+            >
+              💼
+              <h3>Job Drives</h3>
+            </Link>
+
+            <Link
+              to="/placement/applications"
+              className="dashboard-card"
+            >
+              📝
+              <h3>Applications</h3>
+            </Link>
+
+            <Link
+              to="/placement/selection-rounds"
+              className="dashboard-card"
+            >
+              📋
+              <h3>Selection Rounds</h3>
+            </Link>
+
+            <Link
+              to="/placement/scheduling"
+              className="dashboard-card"
+            >
+              📅
+              <h3>Scheduling</h3>
+            </Link>
+
+            <Link
+              to="/placement/offers"
+              className="dashboard-card"
+            >
+              🎓
+              <h3>Offers</h3>
+            </Link>
+
+            <Link
+              to="/placement/documents"
+              className="dashboard-card"
+            >
+              📁
+              <h3>Documents</h3>
+            </Link>
+
+            <Link
+              to="/placement/notifications"
+              className="dashboard-card"
+            >
+              🔔
+              <h3>Notifications</h3>
+            </Link>
+
+          </div>
+
+        </main>
+      </div>
+    </div>
+  );
+}
+
+// ============================================================
+// ADMIN DASHBOARD
+// ============================================================
+
+function AdminDashboard() {
+  return (
+    <div className="dashboard-page">
+      <DashboardHeader
+        title="Admin Dashboard"
+        role="ADMIN"
+      />
+
+      <div className="dashboard-body">
+        <Sidebar
+          items={getNavigation("ADMIN")}
+        />
+
+        <main className="page-content">
+          <h2>Admin Dashboard</h2>
+
+          <p>
+            Manage the entire CampusLink
+            platform.
+          </p>
+
+          <div className="dashboard-grid">
+
+            <Link
+              to="/admin/users"
+              className="dashboard-card"
+            >
+              👥
+              <h3>Users</h3>
+            </Link>
+
+            <Link
+              to="/admin/students"
+              className="dashboard-card"
+            >
+              🎓
+              <h3>Students</h3>
+            </Link>
+
+            <Link
+              to="/admin/recruiters"
+              className="dashboard-card"
+            >
+              🧑‍💼
+              <h3>Recruiters</h3>
+            </Link>
+
+            <Link
+              to="/admin/companies"
+              className="dashboard-card"
+            >
+              🏢
+              <h3>Companies</h3>
+            </Link>
+
+            <Link
+              to="/admin/jobs"
+              className="dashboard-card"
+            >
+              💼
+              <h3>Job Drives</h3>
+            </Link>
+
+            <Link
+              to="/admin/audit"
+              className="dashboard-card"
+            >
+              🔐
+              <h3>Audit Logs</h3>
+            </Link>
+
+          </div>
+        </main>
+      </div>
+    </div>
+  );
+}
+
+// ============================================================
+// APP
+// ============================================================
+
+function App() {
+  return (
+    <BrowserRouter>
+      <Routes>
+
+        {/* LOGIN */}
+
+        <Route
+          path="/login"
+          element={<Login />}
+        />
+
+        {/* ==================================================
+            STUDENT
+        ================================================== */}
+
+        <Route
+          path="/student"
+          element={
+            <ProtectedRoute
+              allowedRoles={[
+                "STUDENT",
+              ]}
+            >
+              <StudentDashboard />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/student/profile"
+          element={
+            <ProtectedRoute
+              allowedRoles={[
+                "STUDENT",
+              ]}
+            >
+              <StudentProfile />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/student/resume-ai"
+          element={
+            <ProtectedRoute
+              allowedRoles={[
+                "STUDENT",
+              ]}
+            >
+              <StudentResumeAI />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/student/jobs"
+          element={
+            <ProtectedRoute
+              allowedRoles={[
+                "STUDENT",
+              ]}
+            >
+              <StudentJobs />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/student/applications"
+          element={
+            <ProtectedRoute
+              allowedRoles={[
+                "STUDENT",
+              ]}
+            >
+              <StudentApplications />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/student/interviews"
+          element={
+            <ProtectedRoute
+              allowedRoles={[
+                "STUDENT",
+              ]}
+            >
+              <StudentInterviews />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/student/offers"
+          element={
+            <ProtectedRoute
+              allowedRoles={[
+                "STUDENT",
+              ]}
+            >
+              <StudentOffers />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/student/documents"
+          element={
+            <ProtectedRoute
+              allowedRoles={[
+                "STUDENT",
+              ]}
+            >
+              <StudentDocuments />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/student/notifications"
+          element={
+            <ProtectedRoute
+              allowedRoles={[
+                "STUDENT",
+              ]}
+            >
+              <StudentNotifications />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/student/recommendations"
+          element={
+            <ProtectedRoute
+              allowedRoles={[
+                "STUDENT",
+              ]}
+            >
+              <StudentAIRecommendations />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* ==================================================
+            RECRUITER
+        ================================================== */}
+
+        <Route
+          path="/recruiter"
+          element={
+            <ProtectedRoute
+              allowedRoles={[
+                "RECRUITER",
+              ]}
+            >
+              <RecruiterDashboard />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/recruiter/ai-candidates"
+          element={
+            <ProtectedRoute
+              allowedRoles={[
+                "RECRUITER",
+              ]}
+            >
+              <RecruiterAICandidates />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/recruiter/company"
+          element={
+            <ProtectedRoute
+              allowedRoles={[
+                "RECRUITER",
+              ]}
+            >
+              <FeaturePage
+                role="RECRUITER"
+                title="Company"
+              />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/recruiter/jobs"
+          element={
+            <ProtectedRoute
+              allowedRoles={[
+                "RECRUITER",
+              ]}
+            >
+              <FeaturePage
+                role="RECRUITER"
+                title="Job Drives"
+              />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/recruiter/applications"
+          element={
+            <ProtectedRoute
+              allowedRoles={[
+                "RECRUITER",
+              ]}
+            >
+              <FeaturePage
+                role="RECRUITER"
+                title="Applications"
+              />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/recruiter/interviews"
+          element={
+            <ProtectedRoute
+              allowedRoles={[
+                "RECRUITER",
+              ]}
+            >
+              <FeaturePage
+                role="RECRUITER"
+                title="Interviews"
+              />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/recruiter/offers"
+          element={
+            <ProtectedRoute
+              allowedRoles={[
+                "RECRUITER",
+              ]}
+            >
+              <FeaturePage
+                role="RECRUITER"
+                title="Offers"
+              />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/recruiter/notifications"
+          element={
+            <ProtectedRoute
+              allowedRoles={[
+                "RECRUITER",
+              ]}
+            >
+              <FeaturePage
+                role="RECRUITER"
+                title="Notifications"
+              />
+            </ProtectedRoute>
+          }
+        />
+
+       <Route
+  path="/recruiter/company"
+  element={
+    <ProtectedRoute allowedRoles={["RECRUITER"]}>
+      <RecruiterCompany />
+    </ProtectedRoute>
+  }
+/>
+
+<Route
+  path="/recruiter/jobs"
+  element={
+    <ProtectedRoute allowedRoles={["RECRUITER"]}>
+      <RecruiterJobs />
+    </ProtectedRoute>
+  }
+/>
+
+<Route
+  path="/recruiter/applications"
+  element={
+    <ProtectedRoute allowedRoles={["RECRUITER"]}>
+      <RecruiterApplications />
+    </ProtectedRoute>
+  }
+/>
+
+<Route
+  path="/recruiter/ai-candidates"
+  element={
+    <ProtectedRoute allowedRoles={["RECRUITER"]}>
+      <RecruiterAICandidates />
+    </ProtectedRoute>
+  }
+/>
+
+<Route
+  path="/recruiter/interviews"
+  element={
+    <ProtectedRoute allowedRoles={["RECRUITER"]}>
+      <RecruiterInterviews />
+    </ProtectedRoute>
+  }
+/>
+
+<Route
+  path="/recruiter/offers"
+  element={
+    <ProtectedRoute allowedRoles={["RECRUITER"]}>
+      <RecruiterOffers />
+    </ProtectedRoute>
+  }
+/>
+
+<Route
+  path="/recruiter/notifications"
+  element={
+    <ProtectedRoute allowedRoles={["RECRUITER"]}>
+      <RecruiterNotifications />
+    </ProtectedRoute>
+  }
+/>
+
+              {/* ==================================================
+           RECRUITER
+        ================================================== */}
+
+        <Route
+          path="/recruiter"
+          element={
+            <ProtectedRoute
+              allowedRoles={[
+                "RECRUITER",
+              ]}
+            >
+              <RecruiterDashboard />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/recruiter/company"
+          element={
+            <ProtectedRoute
+              allowedRoles={[
+                "RECRUITER",
+              ]}
+            >
+              <RecruiterCompany />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/recruiter/jobs"
+          element={
+            <ProtectedRoute
+              allowedRoles={[
+                "RECRUITER",
+              ]}
+            >
+              <RecruiterJobs />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/recruiter/applications"
+          element={
+            <ProtectedRoute
+              allowedRoles={[
+                "RECRUITER",
+              ]}
+            >
+              <RecruiterApplications />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/recruiter/ai-candidates"
+          element={
+            <ProtectedRoute
+              allowedRoles={[
+                "RECRUITER",
+              ]}
+            >
+              <RecruiterAICandidates />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/recruiter/interviews"
+          element={
+            <ProtectedRoute
+              allowedRoles={[
+                "RECRUITER",
+              ]}
+            >
+              <RecruiterInterviews />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/recruiter/offers"
+          element={
+            <ProtectedRoute
+              allowedRoles={[
+                "RECRUITER",
+              ]}
+            >
+              <RecruiterOffers />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/recruiter/notifications"
+          element={
+            <ProtectedRoute
+              allowedRoles={[
+                "RECRUITER",
+              ]}
+            >
+              <RecruiterNotifications />
+            </ProtectedRoute>
+          }
+        />
+        {/* ==================================================
+            ADMIN
+        ================================================== */}
+
+        <Route
+          path="/admin"
+          element={
+            <ProtectedRoute
+              allowedRoles={[
+                "ADMIN",
+              ]}
+            >
+              <AdminDashboard />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/admin/*"
+          element={
+            <ProtectedRoute
+              allowedRoles={[
+                "ADMIN",
+              ]}
+            >
+              <FeaturePage
+                role="ADMIN"
+                title="Admin Module"
+              />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* ==================================================
+            ROOT
+        ================================================== */}
+
+        <Route
+          path="/"
+          element={
+            getRole() ? (
+              <Navigate
+                to={getDashboardPath(
+                  getRole()
+                )}
+                replace
+              />
+            ) : (
+              <Navigate
+                to="/login"
+                replace
+              />
+            )
+          }
+        />
+
+        {/* ==================================================
+            FALLBACK
+        ================================================== */}
+
+        <Route
+          path="*"
+          element={
+            <Navigate
+              to="/"
+              replace
+            />
+          }
+        />
+
+      </Routes>
+    </BrowserRouter>
+  );
+}
+
+export default App;
