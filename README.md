@@ -29,7 +29,24 @@ QuantumCareer Nexus is a web-based campus placement platform designed to connect
 
 ## Architecture
 
-The React frontend communicates with the FastAPI backend through API requests. The backend handles application logic and interacts with the database and configured external services.
+
+```mermaid
+flowchart TD
+    S[Students] --> UI
+    R[Recruiters] --> UI
+    P[Placement Team] --> UI
+
+    UI[React + Vite Frontend] <--> API[FastAPI Backend]
+
+    API <--> DB[(SQLite Database)]
+
+    API --> RES[Resume Text Extraction]
+    API --> JOB[Jobs and Applications]
+    API --> INT[Interviews and Offers]
+    API --> SCORE[Job Readiness Analysis]
+
+    SCORE --> GH[GitHub Repository Analysis]
+```
 
 ## Project Status
 
